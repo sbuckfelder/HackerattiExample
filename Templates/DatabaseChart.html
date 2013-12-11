@@ -1,0 +1,61 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.load('visualization', '1', {packages:['table']});
+      google.setOnLoadCallback(drawTable);
+      google.setOnLoadCallback(drawChart);
+      
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Year', 'Value'],
+	  {% for x in data %}
+          	['{{x.ColumnLabel}}' , {{x.SumValue}} ],
+          {% endfor %}
+        ]);
+
+        var options = {
+         title: 'Cumulative Value by {{interval}}', 
+          hAxis: {textPosition: 'none'}
+        };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+      function drawTable() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('datetime', 'Start Time Stamp');
+	data.addColumn('datetime', 'End Time Stamp');
+        data.addColumn('number', 'Count');
+        data.addColumn('number', 'Sum Value');
+        data.addRows([ 
+	  {% for x in data %}
+          	[new Date('{{x.BeginTime|date:'F d, Y H:i:s'}}'), 
+		new Date('{{x.EndTime|date:'F d, Y H:i:s'}}'), 
+		{{x.Count}} , {{x.SumValue}} ],
+          {% endfor %}
+        ]);
+
+        var table = new google.visualization.Table(document.getElementById('table_div'));
+        table.draw(data, {showRowNumber: true});
+      }
+    </script>
+  </head>
+  <body>
+    <h1> Database Data Aggregated by Time Interval </h1>
+    <p>  The database consists of entries with a timestamp and value. By using the
+         drop down below the user can choose how they would like to aggregate the 
+         values
+    </p>
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+    <form action="/combo/" method="get">
+	<p>
+        {{ form.as_p }}
+	</p>
+        {% csrf_token %}
+        <input type="submit" value="Submit">
+    </form>
+    <div id="table_div"></div>
+  </body>
+</html>

@@ -13,7 +13,7 @@ def graphAndTable(request):
         interval = request.GET['interval']
     tableData = getTableData(interval)
     html = t.render(Context({'data' : tableData, 'form' : form, 'interval' : interval}))
-    #print html  FOR DEBUGGINH
+    #print(html)  FOR DEBUG
     return HttpResponse(html)
 
         
